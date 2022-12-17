@@ -12,7 +12,6 @@ namespace Esercizio02_SRV
         public string ip;
         public UInt16 porta;
         public string messaggio;
-        public string nomeFile;
         public string esito;
 
         public override string ToString()
@@ -23,7 +22,7 @@ namespace Esercizio02_SRV
             return this.ip + " : " +
                 this.porta.ToString() + " - " +
                 this.messaggio +
-                " ==> (" + this.nomeFile + ") " +
+                " ==> " +
                 this.esito;
         }
 

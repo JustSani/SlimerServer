@@ -21,6 +21,12 @@ namespace Esercizio02_SRV
     public partial class Form1 : Form
     {
 
+        int numberOfPlayers = 0;
+        string playerOne = "";
+        string playerTwo = "";
+
+
+
         private clsSocket serverSocket;
         string[] vFiles = new string[99]; // MAX 99 Files
         private string pathFiles;
@@ -119,65 +125,59 @@ namespace Esercizio02_SRV
              * "*TEST*" ==> test x la Connessione
              * "*SEND*" ==> invio Dati dal Client
              *              es. "*SEND*@nomeFile@dati"
-             * "*_END*" ==> fine trasferimento File
+             * "*READY*" ==> Incrementa il numero di giocatori pronti
+             * "*ASKING*" ==> 
+             * 
              */
 
             string tipoRQ;
             string[] vDati;
             StreamWriter fileTXT;
 
-            tipoRQ = Msg.messaggio.Substring(0, 6);
-
+            tipoRQ = Msg.messaggio.Split('*')[1];
             switch (tipoRQ)
             {
-                case "*TEST*":
-
+                case "TEST":
                     // Gestisco TEST di Connessione
-                    Msg.esito = "*OK";
+                    Msg.esito = "*CONN*@In attesa che tutti i giocatori siano pronti";
                     break;
 
-                case "*SEND*":
-
-                    // Gestisco i Dati ricevuti dal Client
-
-                    vDati = Msg.messaggio.Split('@');
-
-                    // Nome del File
-                    Msg.nomeFile = vDati[1];
-
-                    // Controllo se il Nome File è già stato gestito
-                    if (chkNomeFile(vDati[1]))
-                    {
-                        // Gestisco il Dato ricevuto dal Clinet
-                        // Aggiungo al File sul Server precedentemente creato
-                        fileTXT = new StreamWriter(pathFiles + vDati[1], true);
-                        fileTXT.WriteLine(vDati[2]);
-                        fileTXT.Close();
-                        Msg.esito = "*RSP*@File aggiornato";
-                    }
+                case "READY":
+                    // Gestisco il giocatore pronto
+                    numberOfPlayers++;
+                    if(numberOfPlayers == 1)
+                        playerOne = Msg.ip;
                     else
-                    {
-                        // Aggiungo il File nell'Elenco
-                        // Creo il File sul Server
-                        fileTXT = new StreamWriter(pathFiles + vDati[1]);
-                        fileTXT.Close();
-                        Msg.esito = "*RSP*@File creato con successo";
+                        playerTwo = Msg.ip;
+
+                    Msg.esito = "*READY*";
+                    break;
+                case "ASKING":
+                    if(numberOfPlayers == 1)
+                        Msg.esito = "*WAIT*@In attesa di 1 giocatore";
+                    else { 
+                        if(playerOne == Msg.ip)
+                            Msg.esito = "*START*@Tutti i giocatori sono pronti&One";
+                        else
+                            Msg.esito = "*START*@Tutti i giocatori sono pronti&Two";
                     }
+                    break;
+
+                case "SEND":
+                    // Gestisco i Dati ricevuti dal Client
+                    Msg.esito = "*tks*";
 
                     break;
 
-                case "*_END*":
+                case "NEWS":
+                    // Gestisco i Dati ricevuti dal Client
+                    Msg.esito = "*HERE*@";
 
-                    // Gestisco la Fine dei Dati dal Client
+                    break;
 
-                    vDati = Msg.messaggio.Split('@');
+                case "_END":
 
-                    // Nome del File
-                    Msg.nomeFile = vDati[1];
-
-                    // Rimuovo il Nome File dall' Elenco 
-                    removeNomeFile(vDati[1]);
-
+                    
                     Msg.esito = "*RSP*@Fine File";
 
                     break;
@@ -199,49 +199,17 @@ namespace Esercizio02_SRV
         {
             lstLOG.Items.Add(Msg.ToString());
         }
-
-        private bool chkNomeFile(string NomeFile)
-        {
-            bool esito = false;
-            int I;
-
-            // Scorro l'Elenco dei File "in Elaborazione"
-            for (I = 0; I < vFiles.Length; I++)
-                if (vFiles[I] == NomeFile)
-                {
-                    esito = true;
-                    break;
-                }
-
-            if (!esito)
-            {
-                for(I=0; I< vFiles.Length; I++)
-                    if (vFiles[I] == null)
-                    {
-                        vFiles[I] = NomeFile;
-                        break;
-                    }
-            }
-
-            return esito;
-        }
-
-        private void removeNomeFile(string NomeFile)
-        {
-            int I;
-
-            // Scorro l'Elenco dei File "in Elaborazione"
-            for (I = 0; I < vFiles.Length; I++)
-                if (vFiles[I] == NomeFile)
-                {
-                    vFiles[I] = null;
-                    break;
-                }
-        }
+        
 
         private void btnPulisci_Click(object sender, EventArgs e)
         {
             lstLOG.Items.Clear();
+        }
+
+        private void btnStart_Click(object sender, EventArgs e)
+        {
+
+            numberOfPlayers++;
         }
     }
 }

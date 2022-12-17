@@ -40,13 +40,15 @@
             this.label1 = new System.Windows.Forms.Label();
             this.grpLog = new System.Windows.Forms.GroupBox();
             this.lstLOG = new System.Windows.Forms.ListBox();
-            this.btnPulisci = new System.Windows.Forms.Button();
+            this.start = new System.Windows.Forms.Button();
+            this.btnStart = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.grpLog.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.btnStart);
             this.groupBox1.Controls.Add(this.btnArresta);
             this.groupBox1.Controls.Add(this.btnAvvia);
             this.groupBox1.Controls.Add(this.lblStatoServer);
@@ -151,7 +153,7 @@
             // grpLog
             // 
             this.grpLog.Controls.Add(this.lstLOG);
-            this.grpLog.Controls.Add(this.btnPulisci);
+            this.grpLog.Controls.Add(this.start);
             this.grpLog.Enabled = false;
             this.grpLog.Location = new System.Drawing.Point(12, 195);
             this.grpLog.Name = "grpLog";
@@ -169,15 +171,27 @@
             this.lstLOG.Size = new System.Drawing.Size(764, 381);
             this.lstLOG.TabIndex = 1;
             // 
-            // btnPulisci
+            // start
             // 
-            this.btnPulisci.Location = new System.Drawing.Point(695, 19);
-            this.btnPulisci.Name = "btnPulisci";
-            this.btnPulisci.Size = new System.Drawing.Size(75, 19);
-            this.btnPulisci.TabIndex = 0;
-            this.btnPulisci.Text = "Pulisci";
-            this.btnPulisci.UseVisualStyleBackColor = true;
-            this.btnPulisci.Click += new System.EventHandler(this.btnPulisci_Click);
+            this.start.Location = new System.Drawing.Point(695, 19);
+            this.start.Name = "start";
+            this.start.Size = new System.Drawing.Size(75, 19);
+            this.start.TabIndex = 0;
+            this.start.Text = "Pulisci";
+            this.start.UseVisualStyleBackColor = true;
+            this.start.Click += new System.EventHandler(this.btnPulisci_Click);
+            // 
+            // btnStart
+            // 
+            this.btnStart.BackColor = System.Drawing.Color.Orange;
+            this.btnStart.ForeColor = System.Drawing.SystemColors.MenuHighlight;
+            this.btnStart.Location = new System.Drawing.Point(324, 111);
+            this.btnStart.Name = "btnStart";
+            this.btnStart.Size = new System.Drawing.Size(176, 60);
+            this.btnStart.TabIndex = 8;
+            this.btnStart.Text = "START PARTITA";
+            this.btnStart.UseVisualStyleBackColor = false;
+            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
             // Form1
             // 
@@ -211,7 +225,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox grpLog;
         private System.Windows.Forms.ListBox lstLOG;
-        private System.Windows.Forms.Button btnPulisci;
+        private System.Windows.Forms.Button start;
+        private System.Windows.Forms.Button btnStart;
     }
 }
 
