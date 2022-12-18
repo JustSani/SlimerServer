@@ -24,6 +24,8 @@ namespace Esercizio02_SRV
         int numberOfPlayers = 0;
         string playerOne = "";
         string playerTwo = "";
+        string[] playerOneVector = new string[2]; //[0] --> x
+        string[] playerTwoVector = new string[2]; //[1] --> y
 
 
 
@@ -57,6 +59,11 @@ namespace Esercizio02_SRV
 
         private void btnAvvia_Click(object sender, EventArgs e)
         {
+
+            playerOneVector[0] = "0";
+            playerOneVector[1] = "0";
+            playerTwoVector[0] = "0";
+            playerTwoVector[1] = "0";
             IPAddress ip;
             bool errore = false;
 
@@ -166,17 +173,35 @@ namespace Esercizio02_SRV
                 case "SEND":
                     // Gestisco i Dati ricevuti dal Client
                     Msg.esito = "*tks*";
+                    if(Msg.ip == playerOne)
+                    {
+                        playerOneVector[0] = Msg.messaggio.Split(':')[1].Split('#')[0];
+                        playerOneVector[1] = Msg.messaggio.Split(':')[2];
+                        //MessageBox.Show("Your cords: " + playerOneVector[0] + ", " + playerOneVector[1]);
+                    }
+                    else
+                    {
+                        playerTwoVector[0] = Msg.messaggio.Split(':')[1].Split('#')[0];
+                        playerTwoVector[1] = Msg.messaggio.Split(':')[2];
+                        //MessageBox.Show("Your cords: " + Msg.messaggio);
+                        //MessageBox.Show("Your cords: " + playerTwoVector[0] + ", " + playerTwoVector[1]);
+                    }
+
 
                     break;
 
                 case "NEWS":
-                    // Gestisco i Dati ricevuti dal Client
-                    Msg.esito = "*HERE*@";
-
+                    // Rispondo con le coordinate
+                    if(playerOne == Msg.ip) { 
+                        Msg.esito = "*HERE*@p2Position=X:" + playerTwoVector[0].ToString() + "#Y:" + playerTwoVector[1].ToString();
+                    }
+                    else{
+                        Msg.esito = "*HERE*@p1Position=X:" + playerOneVector[0].ToString() + "#Y:" + playerOneVector[1].ToString();
+                    }
+                    
                     break;
 
                 case "_END":
-
                     
                     Msg.esito = "*RSP*@Fine File";
 
@@ -189,7 +214,6 @@ namespace Esercizio02_SRV
 
             // Invio la Risposta (Messaggio) al Client
             serverSocket.inviaMsgSERVER(Msg.esito);
-
             // Visualizzo il Messaggio ricevuto dal Client nella Lista LOG
             aggiornaGraficaEventHandler pt = new aggiornaGraficaEventHandler(aggiornaGrafica);
             this.Invoke(pt, Msg);
