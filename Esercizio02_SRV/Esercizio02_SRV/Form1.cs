@@ -24,6 +24,10 @@ namespace Esercizio02_SRV
         int numberOfPlayers = 0;
         string playerOne = "";
         string playerTwo = "";
+        bool playerOnePendingAttack;
+        bool playerTwoPendingAttack;
+        string playerOnePendingKilled;
+        string playerTwoPendingKilled;
         string[] playerOneVector = new string[2]; //[0] --> x
         string[] playerTwoVector = new string[2]; //[1] --> y
 
@@ -64,6 +68,14 @@ namespace Esercizio02_SRV
             playerOneVector[1] = "0";
             playerTwoVector[0] = "0";
             playerTwoVector[1] = "0";
+            numberOfPlayers = 0;
+            playerOne = "";
+            playerTwo = "";
+            playerOnePendingAttack = false;
+            playerTwoPendingAttack = false;
+            playerOnePendingKilled = "";
+            playerTwoPendingKilled = "";
+
             IPAddress ip;
             bool errore = false;
 
@@ -173,30 +185,73 @@ namespace Esercizio02_SRV
                 case "SEND":
                     // Gestisco i Dati ricevuti dal Client
                     Msg.esito = "*tks*";
-                    if(Msg.ip == playerOne)
-                    {
-                        playerOneVector[0] = Msg.messaggio.Split(':')[1].Split('#')[0];
-                        playerOneVector[1] = Msg.messaggio.Split(':')[2];
-                        //MessageBox.Show("Your cords: " + playerOneVector[0] + ", " + playerOneVector[1]);
-                    }
-                    else
-                    {
-                        playerTwoVector[0] = Msg.messaggio.Split(':')[1].Split('#')[0];
-                        playerTwoVector[1] = Msg.messaggio.Split(':')[2];
-                        //MessageBox.Show("Your cords: " + Msg.messaggio);
-                        //MessageBox.Show("Your cords: " + playerTwoVector[0] + ", " + playerTwoVector[1]);
-                    }
 
+
+                    //MESSAGGIO DI ATTACCO
+                    if (Msg.messaggio.Contains("KILLED"))
+                    {
+                        if (Msg.ip == playerOne)
+                            playerOnePendingKilled = Msg.messaggio.Split('-')[1];
+                        else
+                            playerTwoPendingKilled = Msg.messaggio.Split('-')[1];
+                    }
+                    if (Msg.messaggio.Contains("FIRE"))
+                    {
+                        if (Msg.ip == playerOne)
+                            playerOnePendingAttack = true;
+                        else
+                            playerTwoPendingAttack = true;
+                    }//MESSAGGIO DI MOVE
+                    else { 
+                        if(Msg.ip == playerOne)
+                        {
+                            playerOneVector[0] = Msg.messaggio.Split(':')[1].Split('#')[0];
+                            playerOneVector[1] = Msg.messaggio.Split(':')[2];
+                            //MessageBox.Show("Your cords: " + playerOneVector[0] + ", " + playerOneVector[1]);
+                        }
+                        else
+                        {
+                            playerTwoVector[0] = Msg.messaggio.Split(':')[1].Split('#')[0];
+                            playerTwoVector[1] = Msg.messaggio.Split(':')[2];
+                            //MessageBox.Show("Your cords: " + Msg.messaggio);
+                            //MessageBox.Show("Your cords: " + playerTwoVector[0] + ", " + playerTwoVector[1]);
+                        }
+                    }
 
                     break;
 
                 case "NEWS":
                     // Rispondo con le coordinate
-                    if(playerOne == Msg.ip) { 
-                        Msg.esito = "*HERE*@p2Position=X:" + playerTwoVector[0].ToString() + "#Y:" + playerTwoVector[1].ToString();
+                    if(playerOne == Msg.ip) {
+                        if (playerTwoPendingAttack && playerTwoPendingKilled != "")
+                        {
+                            Msg.esito = "*HERE*FIRE&KILLED-" + playerTwoPendingKilled + "-";
+                            playerTwoPendingAttack = false;
+                            playerTwoPendingKilled = "";
+                        }
+                        else if (playerTwoPendingAttack)
+                        {
+                            Msg.esito = "*HERE*FIRE";
+                            playerTwoPendingAttack = false;
+                        }
+                        else 
+                            Msg.esito = "*HERE*@p2Position=X:" + playerTwoVector[0].ToString() + "#Y:" + playerTwoVector[1].ToString();
                     }
-                    else{
-                        Msg.esito = "*HERE*@p1Position=X:" + playerOneVector[0].ToString() + "#Y:" + playerOneVector[1].ToString();
+                    else
+                    {
+                        if (playerOnePendingAttack && playerOnePendingKilled != "")
+                        {
+                            Msg.esito = "*HERE*FIRE&KILLED-" + playerOnePendingKilled + "-";
+                            playerOnePendingAttack = false;
+                            playerOnePendingKilled = "";
+                        }
+                        else if (playerOnePendingAttack)
+                        {
+                            Msg.esito = "*HERE*FIRE";
+                            playerOnePendingAttack = false;
+                        }
+                        else
+                            Msg.esito = "*HERE*@p1Position=X:" + playerOneVector[0].ToString() + "#Y:" + playerOneVector[1].ToString();
                     }
                     
                     break;
